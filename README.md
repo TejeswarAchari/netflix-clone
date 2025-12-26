@@ -63,4 +63,5 @@
     - Search Bar
     - Movie Suggestions
 
-
+# Netflix Backround Image Login Page
+"https://assets.nflxext.com/ffe/siteui/vlv3/9ddb442a-aca7-4d85-9cd1-dbed62f18f26/web/IN-en-20251222-TRIFECTA-perspective_a882efaa-75c8-4143-9dc1-4f9932a791ac_large.jpg" 
