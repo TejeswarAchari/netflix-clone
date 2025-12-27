@@ -4,19 +4,48 @@ import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
+import { onAuthStateChanged } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { addUser, removeUser } from "../utils/userSlice";
+import { LOGO } from "../utils/constants";
 
 const Header = () => {
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
+  const dispatch = useDispatch();
 
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
 
   const handleSignOut = () => {
     signOut(auth)
-      .then(() => navigate("/"))
+      .then(() => {})
       .catch(() => navigate("/error"));
   };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const { uid, email, displayName, photoURL } = user;
+        dispatch(
+          addUser({
+            uid: uid,
+            email: email,
+            name: displayName,
+            photoURL: photoURL,
+          })
+        );
+        navigate("/browse");
+      } else {
+        dispatch(removeUser());
+        navigate("/");
+      }
+    });
+
+    return () => {
+     unsubscribe();
+    };
+  }, []);
 
   // 🔹 Close dropdown when clicking outside
   useEffect(() => {
@@ -32,11 +61,7 @@ const Header = () => {
 
   return (
     <div className="absolute w-screen z-10 px-8 py-2 bg-gradient-to-b from-black flex justify-between items-center">
-      <img
-        className="w-44"
-        src="https://help.nflxext.com/helpcenter/OneTrust/oneTrust_production_2025-12-03/consent/87b6a5c0-0104-4e96-a291-092c11350111/019ae4b5-d8fb-7693-90ba-7a61d24a8837/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png"
-        alt="logo"
-      />
+      <img className="w-44" src={LOGO} alt="logo" />
 
       {user && (
         <div ref={menuRef} className="relative flex items-center gap-2">
@@ -50,7 +75,6 @@ const Header = () => {
             alt="user-profile"
           />
 
-          
           <AnimatePresence>
             {showMenu && (
               <motion.div

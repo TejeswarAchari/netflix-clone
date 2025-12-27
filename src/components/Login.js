@@ -7,16 +7,18 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
-import { useNavigate } from "react-router-dom";
+
 import { updateProfile } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
+
+import { PHOTO_URL } from "../utils/constants";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+
   const email = useRef(null);
   const password = useRef(null);
   const name = useRef(null);
@@ -46,8 +48,7 @@ const Login = () => {
           const user = userCredential.user;
           updateProfile(user, {
             displayName: name.current.value,
-            photoURL:
-              "https://cdn.imgbin.com/1/19/14/social-icon-male-user-icon-man-icon-xqC9m5zD.jpg",
+            photoURL: PHOTO_URL,
           })
             .then(() => {
               const { uid, email, displayName, photoURL } = auth.currentUser;
@@ -59,7 +60,7 @@ const Login = () => {
                   photoURL: photoURL,
                 })
               );
-              navigate("/browse");
+             
             })
             .catch((error) => {
               setErrorMessage(error.message);
@@ -75,7 +76,7 @@ const Login = () => {
         password.current.value
       )
         .then((userCredential) => {
-          navigate("/browse");
+          
         })
         .catch((error) => {
           setErrorMessage(error.message);
@@ -84,7 +85,7 @@ const Login = () => {
   };
 
   return (
-    <div >
+    <div>
       <Header />
       <div className="absolute">
         <img
