@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "netflixgpt-a4d16",
+    "live": "netflixgpt-final-f1f1a"
+  },
+  "targets": {},
+  "etags": {}
+}
