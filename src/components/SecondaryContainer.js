@@ -7,7 +7,8 @@ const SecondaryContainer = () => {
   return (
     movies.nowPlayingMovies && (
       <div className="bg-black">
-        <div className="-mt-52 pl-6 relative z-20 space-y-6">
+        {/* Adjusted negative margin to prevent overlap with title/buttons */}
+        <div className="mt-0 md:-mt-40 lg:-mt-52 pl-4 md:pl-12 relative z-20">
           <MovieList
             title={"Now Playing"}
             movies={movies.nowPlayingMovies}

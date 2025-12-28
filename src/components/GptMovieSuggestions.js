@@ -7,16 +7,18 @@ const GptMovieSuggestions = () => {
   if (!movieNames || !gptMovieResults) return null;
 
   return (
-    <div className="relative z-10 p-4 m-4 bg-black text-white bg-opacity-80 rounded-lg">
-      {movieNames.map((movieName, index) =>
-        gptMovieResults[index] ? (
-          <MovieList
-            key={`${movieName}-${index}`}
-            title={movieName}
-            movies={gptMovieResults[index]}
-          />
-        ) : null
-      )}
+    <div className="p-4 m-4 bg-black text-white bg-opacity-90 rounded-lg">
+      <div>
+        {movieNames.map((movieName, index) =>
+          gptMovieResults[index] ? (
+            <MovieList
+              key={`${movieName}-${index}`}
+              title={movieName}
+              movies={gptMovieResults[index]}
+            />
+          ) : null
+        )}
+      </div>
     </div>
   );
 };

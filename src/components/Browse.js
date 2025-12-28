@@ -12,20 +12,26 @@ import { useSelector } from 'react-redux';
 
 const Browse = () => {
   const showGptSearch = useSelector((store) => store.gpt?.showGptSearch);
+  
   useNowPlayingMovies();
   usePopularMovies();
   useUpcomingMovies();
   useTopRatedMovies();
   useHorrorMovies();
+
   return (
     <div>
-    <Header/>
-   {showGptSearch ? <GptSearch/> : <>  <MainContainer/>
-    <SecondaryContainer/>
-   </>}
-  
+      <Header />
+      {showGptSearch ? (
+        <GptSearch />
+      ) : (
+        <>
+          <MainContainer />
+          <SecondaryContainer />
+        </>
+      )}
     </div>
-  )
+  );
 }
 
-export default Browse
+export default Browse;
