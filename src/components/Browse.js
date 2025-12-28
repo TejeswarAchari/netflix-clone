@@ -8,12 +8,14 @@ import useUpcomingMovies from '../hooks/useUpcomingMovies';
 import useTopRatedMovies from '../hooks/useTopRatedMovies';
 import useHorrorMovies from '../hooks/useHorrorMovies';
 import GptSearch from './GptSearch';
-import MovieModal from './MovieModal'; // Import the new modal
+import MovieModal from './MovieModal';
+import Shimmer from './Shimmer'; // Import Shimmer
 import { useSelector } from 'react-redux';
 
 const Browse = () => {
   const showGptSearch = useSelector((store) => store.gpt?.showGptSearch);
-  
+  const nowPlayingMovies = useSelector((store) => store.movies.nowPlayingMovies);
+
   useNowPlayingMovies();
   usePopularMovies();
   useUpcomingMovies();
@@ -23,16 +25,21 @@ const Browse = () => {
   return (
     <div>
       <Header />
+      <MovieModal />
       
-      {/* The Modal handles its own visibility logic */}
-      <MovieModal /> 
-
       {showGptSearch ? (
         <GptSearch />
       ) : (
         <>
-          <MainContainer />
-          <SecondaryContainer />
+           {/* If movies are not loaded yet, show Shimmer. Otherwise, show content. */}
+           {!nowPlayingMovies ? (
+              <Shimmer /> 
+           ) : (
+              <>
+                <MainContainer />
+                <SecondaryContainer />
+              </>
+           )}
         </>
       )}
     </div>

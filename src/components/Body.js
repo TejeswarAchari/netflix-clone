@@ -1,5 +1,6 @@
 import Login from "./Login";
 import Browse from "./Browse";
+import Error from "./Error"; // Import Error Component
 import { createBrowserRouter } from "react-router-dom";
 import { RouterProvider } from "react-router-dom";
 
@@ -8,11 +9,18 @@ const Body = () => {
     {
       path: "/",
       element: <Login />,
+      errorElement: <Error />, // Handle 404 on root
     },
     {
       path: "/browse",
       element: <Browse />,
+      errorElement: <Error />, // Handle 404 on browse path
     },
+    // Catch-all route for random URLs
+    {
+        path: "*",
+        element: <Error />
+    }
   ]);
 
   return (
