@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { auth } from "../utils/firebase";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,11 +8,18 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { addUser, removeUser } from "../utils/userSlice";
 import { LOGO } from "../utils/constants";
+import { toggleGptSearchView } from '../utils/gptSlice';
+import { SUPPORTED_LANGUAGES } from '../utils/constants';
+import { changeLanguage } from "../utils/configSlice";
+
+
 
 const Header = () => {
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
+  
+const isGptSearchActive = useSelector(store=>store.gpt.showGptSearch);
 
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
@@ -59,14 +66,33 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleGPTSearchClick = () => {
+    dispatch(toggleGptSearchView());
+  };
+
+  const handleLanguageChange = (e) => {
+    const selectedLanguage = e.target.value;
+    dispatch(changeLanguage(selectedLanguage));
+   
+    }
   return (
     <div className="absolute w-screen z-10 px-8 py-3
   bg-gradient-to-b from-black via-black/60 to-transparent
   flex justify-between items-center">
-      <img className="w-44" src={LOGO} alt="logo" />
+   <img className="w-44" src={LOGO} alt="logo" />
 
       {user && (
         <div ref={menuRef} className="relative flex items-center gap-2">
+
+          {isGptSearchActive && <select className="p-2 m-2 bg-gray-900 text-white" onChange={handleLanguageChange}>
+  {SUPPORTED_LANGUAGES.map((lang) => (
+    <option key={lang.identifier} value={lang.identifier}>
+      {lang.name}
+    </option>
+  ))}
+</select>}
+
+          <button onClick={handleGPTSearchClick} className="bg-red-600 p-2 px-5 text-white rounded-md">{isGptSearchActive ? "Back to Home" : "Ask GPT"}</button>
           <p className="text-white font-bold">{user.name}</p>
 
           {/* Profile Icon */}
