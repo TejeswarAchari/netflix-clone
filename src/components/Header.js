@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
-import { signOut } from "firebase/auth";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
-import { onAuthStateChanged } from "firebase/auth";
-import { useDispatch } from "react-redux";
+
+// CLERK IMPORTS
+import { useUser, useClerk } from "@clerk/clerk-react";
+
 import { addUser, removeUser } from "../utils/userSlice";
 import { LOGO } from "../utils/constants";
 import { toggleGptSearchView } from '../utils/gptSlice';
@@ -14,52 +14,55 @@ import { changeLanguage } from "../utils/configSlice";
 
 const Header = () => {
   const navigate = useNavigate();
-  const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
+  
+  // Clerk Hooks
+  const { user, isSignedIn, isLoaded } = useUser();
+  const { signOut } = useClerk();
 
   const isGptSearchActive = useSelector((store) => store.gpt.showGptSearch);
-
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
 
-  const handleSignOut = () => {
-    signOut(auth)
-      .then(() => {})
-      .catch(() => navigate("/error"));
-  };
-
+  // 🔹 SYNC CLERK USER TO REDUX STORE
+  // This replaces the old Firebase onAuthStateChanged
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const { uid, email, displayName, photoURL } = user;
+    if (isLoaded) {
+      if (isSignedIn && user) {
+        // User is logged in -> Add to Redux
+        const { id, primaryEmailAddress, fullName, imageUrl } = user;
         dispatch(
           addUser({
-            uid: uid,
-            email: email,
-            name: displayName,
-            photoURL: photoURL,
+            uid: id,
+            email: primaryEmailAddress?.emailAddress,
+            name: fullName || "User",
+            photoURL: imageUrl,
           })
         );
-        navigate("/browse");
+        // Only navigate if we are currently on the login page ("/")
+        if (window.location.pathname === "/") {
+            navigate("/browse");
+        }
       } else {
+        // User is logged out -> Remove from Redux
         dispatch(removeUser());
         navigate("/");
       }
-    });
+    }
+  }, [isLoaded, isSignedIn, user, dispatch, navigate]);
 
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+  const handleSignOut = async () => {
+    await signOut();
+    // Redux update is handled by the useEffect above automatically
+  };
 
-  // 🔹 Close dropdown when clicking outside
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setShowMenu(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -69,14 +72,17 @@ const Header = () => {
   };
 
   const handleLanguageChange = (e) => {
-    const selectedLanguage = e.target.value;
-    dispatch(changeLanguage(selectedLanguage));
+    dispatch(changeLanguage(e.target.value));
   };
+
   return (
     <div className="absolute w-full z-10 px-4 py-2 md:px-8 md:py-3 bg-gradient-to-b from-black via-black/60 to-transparent flex justify-between items-center">
-      <img className="w-24 md:w-44" src={LOGO} alt="logo" />
+      {/* 🔹 UPDATED LOGO: Text instead of Image to avoid bans */}
+      <h1 className="text-3xl font-bold text-red-600 tracking-wide cursor-pointer" onClick={()=> navigate("/")}>
+        FrameOne
+      </h1>
 
-      {user && (
+      {isSignedIn && user && (
         <div ref={menuRef} className="relative flex items-center gap-2">
           {isGptSearchActive && (
             <select
@@ -98,16 +104,14 @@ const Header = () => {
             {isGptSearchActive ? "Back to Home" : "Ask GPT"}
           </button>
           
-          {/* Hidden on mobile, shown on medium screens and up */}
           <p className="hidden md:block text-white font-bold text-sm md:text-base">
-            {user.name}
+            {user.fullName}
           </p>
 
-          {/* Profile Icon */}
           <img
             onClick={() => setShowMenu((prev) => !prev)}
-            className="h-8 w-8 md:h-10 md:w-10 rounded-sm cursor-pointer hover:opacity-90 object-cover"
-            src={user.photoURL}
+            className="h-8 w-8 md:h-10 md:w-10 rounded-full cursor-pointer hover:opacity-90 object-cover border-2 border-transparent hover:border-white transition"
+            src={user.imageUrl}
             alt="user-profile"
           />
 

@@ -1,137 +1,72 @@
-import React, { useRef } from "react";
+import React, { useState } from "react";
 import Header from "./Header";
-import { useState } from "react";
-import { checkValidateData } from "../utils/validate";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { auth } from "../utils/firebase";
-
-import { updateProfile } from "firebase/auth";
-import { useDispatch } from "react-redux";
-import { addUser } from "../utils/userSlice";
-
-import { BG_IMAGE_URL, PHOTO_URL } from "../utils/constants";
+import { BG_IMAGE_URL } from "../utils/constants";
+import { SignIn, SignUp } from "@clerk/clerk-react";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
-  const dispatch = useDispatch();
 
-  const email = useRef(null);
-  const password = useRef(null);
-  const name = useRef(null);
-  const toggleSignInForm = () => {
-    setIsSignInForm(!isSignInForm);
-  };
-
-  const handleButtonClick = (e) => {
-    e.preventDefault();
-
-    const message = checkValidateData(
-      email.current.value,
-      password.current.value,
-      isSignInForm ? null : name.current.value
-    );
-
-    setErrorMessage(message ? message.message : "");
-    if (message) return;
-
-    if (!isSignInForm) {
-      createUserWithEmailAndPassword(
-        auth,
-        email.current.value,
-        password.current.value
-      )
-        .then((userCredential) => {
-          const user = userCredential.user;
-          updateProfile(user, {
-            displayName: name.current.value,
-            photoURL: PHOTO_URL,
-          })
-            .then(() => {
-              const { uid, email, displayName, photoURL } = auth.currentUser;
-              dispatch(
-                addUser({
-                  uid: uid,
-                  email: email,
-                  name: displayName,
-                  photoURL: photoURL,
-                })
-              );
-            })
-            .catch((error) => {
-              setErrorMessage(error.message);
-            });
-        })
-        .catch((error) => {
-          setErrorMessage(error.message);
-        });
-    } else {
-      signInWithEmailAndPassword(
-        auth,
-        email.current.value,
-        password.current.value
-      )
-        .then((userCredential) => {})
-        .catch((error) => {
-          setErrorMessage(error.message);
-        });
+  // Manual Dark Theme (Fixes the crash by avoiding the broken import)
+  const clerkAppearance = {
+    variables: {
+      colorPrimary: "#e50914", // Netflix Red
+      colorText: "#ffffff",    // White text
+      colorBackground: "#1a1a1a", // Dark gray background
+      colorInputBackground: "#333333", // Darker gray inputs
+      colorInputText: "#ffffff", // White typing
+    },
+    elements: {
+        rootBox: "w-full mx-auto",
+        card: "shadow-2xl rounded-xl border border-gray-800 mx-auto",
+        footer: "hidden",
+        formFieldInput: "border-gray-700 focus:border-red-600",
+        formButtonPrimary: "hover:bg-red-700",
+        socialButtonsBlockButton: "bg-white text-black hover:bg-gray-200 border-none",
+        headerTitle: "text-white",
+        headerSubtitle: "text-gray-400"
     }
   };
 
   return (
-    <div>
+    <div className="relative min-h-screen w-full flex flex-col font-sans">
       <Header />
-      <div className="absolute inset-0">
+
+      {/* Background Image */}
+      <div className="absolute inset-0 -z-10">
         <img
-          className="h-screen w-screen object-cover"
+          className="h-full w-full object-cover"
           src={BG_IMAGE_URL}
-          alt="logo"
+          alt="background"
         />
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-black/60" />
       </div>
-      <form className="w-10/12 md:w-8/12 lg:w-3/12 absolute p-6 md:p-12 bg-black my-24 md:my-36 mx-auto right-0 left-0 text-white rounded-lg bg-opacity-80">
-        <h1 className="font-bold text-2xl md:text-3xl py-4">
-          {isSignInForm ? "Sign In" : "Sign Up"}
-        </h1>
 
-        {!isSignInForm && (
-          <input
-            ref={name}
-            type="text"
-            placeholder="Full Name"
-            className="p-3 md:p-4 my-2 md:my-4 rounded-sm w-full bg-gray-700 text-sm md:text-base"
-          />
-        )}
-        <input
-          ref={email}
-          type="email"
-          placeholder="Email address"
-          className="p-3 md:p-4 my-2 md:my-4 rounded-sm w-full bg-gray-700 text-sm md:text-base"
-        />
+      {/* Main Content Centered */}
+      <div className="flex-grow flex flex-col justify-center items-center px-4 w-full pt-16">
+        
+        <div className="w-full max-w-[400px]">
+          {isSignInForm ? (
+            <SignIn appearance={clerkAppearance} />
+          ) : (
+            <SignUp appearance={clerkAppearance} />
+          )}
+        </div>
 
-        <input
-          ref={password}
-          type="password"
-          placeholder="Password"
-          className="p-3 md:p-4 my-2 md:my-4 rounded-sm w-full bg-gray-700 text-sm md:text-base"
-        />
-
-        <p className="text-red-600 font-bold text-sm md:text-base py-2">{errorMessage}</p>
-
-        <button
-          className="bg-red-600 w-full text-white px-6 py-3 my-4 rounded-sm hover:bg-red-700 transition duration-200"
-          onClick={handleButtonClick}
+        {/* CUSTOM TOGGLE BUTTON */}
+        <div 
+            className="mt-6 bg-black/80 backdrop-blur-md border border-gray-700 px-6 py-3 rounded-full cursor-pointer hover:bg-red-700/90 hover:border-red-600 transition-all duration-300 group"
+            onClick={() => setIsSignInForm(!isSignInForm)}
         >
-          {isSignInForm ? "Sign In" : "Sign Up"}
-        </button>
-        <p className="py-4 cursor-pointer text-sm md:text-base" onClick={toggleSignInForm}>
-          {isSignInForm
-            ? "New to Netflix? Sign Up Now"
-            : "Already have an account? Sign In"}
-        </p>
-      </form>
+            <p className="text-gray-300 text-sm font-medium group-hover:text-white">
+                {isSignInForm ? "New to FrameOne? " : "Already have an account? "}
+                <span className="text-white font-bold group-hover:underline ml-1">
+                    {isSignInForm ? "Sign Up Now" : "Sign In"}
+                </span>
+            </p>
+        </div>
+
+      </div>
     </div>
   );
 };
