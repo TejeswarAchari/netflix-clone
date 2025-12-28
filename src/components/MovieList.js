@@ -7,7 +7,11 @@ const MovieList = ({ title, movies }) => {
       <div className="flex overflow-x-scroll no-scrollbar">
         <div className="flex">
           {movies?.map((movie) => (
-            <MovieCard key={movie.id} posterPath={movie.poster_path} />
+            <MovieCard 
+                key={movie.id} 
+                posterPath={movie.poster_path} 
+                movie={movie} // Pass the full movie object here!
+            />
           ))}
         </div>
       </div>

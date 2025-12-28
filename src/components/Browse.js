@@ -8,6 +8,7 @@ import useUpcomingMovies from '../hooks/useUpcomingMovies';
 import useTopRatedMovies from '../hooks/useTopRatedMovies';
 import useHorrorMovies from '../hooks/useHorrorMovies';
 import GptSearch from './GptSearch';
+import MovieModal from './MovieModal'; // Import the new modal
 import { useSelector } from 'react-redux';
 
 const Browse = () => {
@@ -22,6 +23,10 @@ const Browse = () => {
   return (
     <div>
       <Header />
+      
+      {/* The Modal handles its own visibility logic */}
+      <MovieModal /> 
+
       {showGptSearch ? (
         <GptSearch />
       ) : (
