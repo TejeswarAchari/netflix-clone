@@ -68,11 +68,7 @@ Follow these steps to set up the project locally.
 - A Firebase Project
 - An OpenAI or Groq API Key
 
-### Installation
-
-## 🚀 Getting Started
-
-Follow these steps to run the project locally.
+## 📦 Installation & Setup
 
 ### 1️⃣ Clone the repository
 ```bash
@@ -85,10 +81,10 @@ npm install
 Create a .env file in the root directory and add the following keys:
 
 env
-REACT_APP_TMDB_KEY=your_tmdb_key
-REACT_APP_OPENAI_KEY=your_openai_or_groq_key
-REACT_APP_FIREBASE_API_KEY=your_firebase_key
-⚠️ Never commit your .env file to GitHub.
+
+REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
+REACT_APP_GROQ_API_KEY=your_groq_api_key
+⚠️ Never commit your .env file to GitHub
 
 4️⃣ Start the development server
 
@@ -96,6 +92,59 @@ npm start
 The app will run on:
 
 http://localhost:3000
+
+📁 Project Constants
+All global constants used across the application are defined in:
+
+src/utils/constants.js
+🔹 Branding & Assets
+
+export const FrameOne = "/FrameOne.png";
+
+export const LOGO = FrameOne;
+
+export const PHOTO_URL =
+  "https://cdn.imgbin.com/1/19/14/social-icon-male-user-icon-man-icon-xqC9m5zD.jpg";
+LOGO: App branding logo
+
+PHOTO_URL: Default user profile avatar
+
+🔹 TMDB API Configuration
+
+export const API_OPTIONS = {
+  method: "GET",
+  headers: {
+    accept: "application/json",
+    Authorization:
+      "Bearer TMDB_API,
+  },
+};
+
+🔹 Image CDN
+
+export const IMG_CDN_URL = "https://image.tmdb.org/t/p/w780";
+Used to render movie posters and backdrops from TMDB
+
+🔹 Background Image
+
+export const BG_IMAGE_URL =
+  "https://assets.nflxext.com/ffe/siteui/vlv3/9ddb442a-aca7-4d85-9cd1-dbed62f18f26/web/IN-en-20251222-TRIFECTA-perspective_a882efaa-75c8-4143-9dc1-4f9932a791ac_large.jpg";
+Netflix-style hero background image
+
+🔹 Supported Languages
+
+export const SUPPORTED_LANGUAGES = [
+  { identifier: "en", name: "English" },
+  { identifier: "hindi", name: "Hindi" },
+  { identifier: "spanish", name: "Spanish" },
+];
+Used for language toggle and AI prompt localization
+
+🌍 Supported Languages
+English
+Hindi
+Spanish
+
 ```
 📄 License
 Distributed under the MIT License.
