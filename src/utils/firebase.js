@@ -2,13 +2,15 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
+//importing dotenv to use environment variables
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyB0Lr8CFLKHX75kzEJdLt9Cad_SmLIR0GM",
+  apiKey:process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: "frameone-ai.firebaseapp.com",
   projectId: "frameone-ai",
   storageBucket: "frameone-ai.firebasestorage.app",
@@ -20,4 +22,4 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-const analytics = getAnalytics(app);
+export const analytics = getAnalytics(app);
